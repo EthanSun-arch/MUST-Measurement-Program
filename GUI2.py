@@ -374,6 +374,7 @@ class PlotPage(tk.Frame):
             global state, title, ylabel
             "Set to voltage-measurment"
             inst_smu.write('MEAS:VOLT?')
+            self.after(1, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to Voltage Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
@@ -387,6 +388,7 @@ class PlotPage(tk.Frame):
             global state, title, ylabel
             "Set to current-measurement"
             inst_smu.write('MEAS:CURR?')
+            self.after(1, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to Current Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
@@ -401,6 +403,7 @@ class PlotPage(tk.Frame):
             "Set to 2 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN OFF')
+            self.after(1, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to 2 Wire Resistance Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
@@ -416,6 +419,7 @@ class PlotPage(tk.Frame):
             "Set to 4 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN ON')
+            self.after(1, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to 4 Wire Resistance Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
@@ -446,7 +450,7 @@ class PlotPage(tk.Frame):
             status_label = ttk.Label(self,text="Status: Live measurement started", 
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 800,y =10)
-            self.after(5,plotting)
+            self.after(1,plotting)
 
         def plot_stop():
             """Ends the live measurement"""
@@ -470,7 +474,8 @@ class PlotPage(tk.Frame):
         def save_data_lad():
             """Save measured Data"""
             global plot_lad
-            np.savetxt(setting_file_entry.get()+str(".csv"), np.transpose(np.array([plot_time,plot_lad])), 
+            np.savetxt(setting_file_entry.get()+str(".csv"), 
+                       np.transpose(np.array([plot_time,plot_lad])), 
                        delimiter= ",", fmt="%s")
 
             global status_label
@@ -489,7 +494,8 @@ class PlotPage(tk.Frame):
             elif state == 2 or state == 3:
                 text = 'Widerstand in Ohm'
                 
-            np.savetxt(setting_file_entry.get()+str(".csv"), np.transpose(np.array([plot_time,plot_res])), 
+            np.savetxt(setting_file_entry.get()+str(".csv"), 
+                       np.transpose(np.array([plot_time,plot_res])), 
                        delimiter= ",", fmt="%s",header= text)
             global status_label
             status_label = ttk.Label(self,text= "Status: Data Saved", 
@@ -569,7 +575,7 @@ class PlotPage(tk.Frame):
                     plot_time.append(datetime.now().isoformat(timespec='microseconds'))
                     plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
                     
-                    self.after(5,plotting)
+                    self.after(1,plotting)
                     
                 if cond_res == True:
                     data_res = inst_smu.query(':READ?')
@@ -578,7 +584,7 @@ class PlotPage(tk.Frame):
                     plot_time.append(datetime.now().isoformat(timespec='microseconds'))
                     plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
                     
-                    self.after(5,plotting)
+                    self.after(1,plotting)
                     
                 if cond_all == True:
                     data_res = inst.query(':READ?')
@@ -594,7 +600,7 @@ class PlotPage(tk.Frame):
                         plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
                         plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
 
-                    self.after(5,plotting)
+                    self.after(1,plotting)
                     
         
         
