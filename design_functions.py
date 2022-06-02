@@ -41,10 +41,10 @@ def data_plot(graph_frame,dpi,f,a,canvas):
 
 
 
-    f = Figure(figsize=(10,4), dpi=dpi)
+    f = Figure(figsize=(5,4), dpi=dpi)
 
 
-    a = f.add_subplot(121)
+    a = f.add_subplot()
 
 
     a.set_title('Measurement of the Charge')
@@ -64,10 +64,10 @@ def data_plot_resistance(title, ylabel, graph_frame, dpi, f = None, a= None, can
 
 
 
-    f = Figure(figsize=(10,4), dpi=dpi)
+    f = Figure(figsize=(5,4), dpi=dpi)
 
 
-    a = f.add_subplot(121)
+    a = f.add_subplot()
 
 
     a.set_title('Measurement of' + " " + title)

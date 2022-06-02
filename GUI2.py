@@ -16,7 +16,7 @@ import numpy as np
 import time
 from time import sleep
 
-global cond, cond_all , cond_res, cond_lad
+global cond, cond_all, cond_all_res, cond_res, cond_lad
 
 class Main_page(tk.Tk):
     """This class is responsible for the main settings of the software"""
@@ -28,7 +28,7 @@ class Main_page(tk.Tk):
         """Settings of the GUI-basics: geometry, title"""
         self.title('Sourcemeter und Elektrometer Messung')
         self.style = Style('darkly')
-        self.geometry('1300x700') 
+        self.geometry('1400x800') 
 
 
         """Set a frame that contains the different classes of the software (Pages)"""
@@ -79,16 +79,17 @@ class StartPage(tk.Frame):
         start_button = ttk.Button(self, text= "Messung",
                                   style= "Outline.TButton", 
                                   command=lambda: controller.show_frame(PlotPage))
-        start_button.place(x = 610, y = 350)
+        start_button.place(x = 675, y = 400)
 
 class PlotPage(tk.Frame):
     """Represents the first page (Start page) of the GUI"""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self,parent)
-        global cond, cond_all, cond_lad, cond_res
+        global cond, cond_all, cond_all_res, cond_lad, cond_res
         cond = False
         cond_all = False
+        cond_all_res = False
         cond_lad = False
         cond_res = False
 
@@ -96,7 +97,7 @@ class PlotPage(tk.Frame):
         """Connect Frame Keiythely 6517A & 2450 """
         connect_Frame = ttk.LabelFrame(self, text= "Connecting Devices" , padding=(4,4,5,5))
         connect_Frame.pack(expand=True)
-        connect_Frame.place(x=20,y=30)
+        connect_Frame.place(x=20, y=45)
         
         "Connect Frame Keithley 6517A"
         connect_lad_button = ttk.Button(connect_Frame, text= "Keithley 6517A", 
@@ -106,42 +107,49 @@ class PlotPage(tk.Frame):
         
         # setting_labelframe = ttk.Labelframe(self, text='Keiythely 6517A', padding=(4, 4, 5, 5))
         # setting_labelframe.pack(expand = True)
-        # setting_labelframe.place(x=20,y=30)
-
-        
+        # setting_labelframe.place(x=20,y=30)        
         # connect_button = ttk.Button(setting_labelframe, text="Connect", 
         #                             style='Outline.TButton',command=lambda: connect_to_lad())
         # connect_button.grid(row=0, column=1, sticky='ew', padx=4, pady=2)
         
-        """Connect Frame Sourcemeter 2450"""
-        connect_res_button = ttk.Button(connect_Frame, text= "SMU 2450", 
+        """Connect Frame Sourcemeter 2450, Nr. xxx"""
+        connect_res_button = ttk.Button(connect_Frame, text= "SMU 2450, Nr. xxx", 
                                         style='Outline.TButton', 
                                         command=lambda: connect_to_res())
-        connect_res_button.grid(row=0, column=1, padx=4, pady=2)
+        connect_res_button.grid(row=1, column=0, padx=4, pady=2)
+        
+        """Connect Frame Sourcemeter 2450, Nr. 041"""
+        connect_res_button = ttk.Button(connect_Frame, text= "SMU 2450, Nr. 041", 
+                                        style='Outline.TButton', 
+                                        command=lambda: connect_to_res2())
+        connect_res_button.grid(row=1, column=1, padx=4, pady=2)
         
         
         # setting_labelframe = ttk.Labelframe(self, text='SMU2450', padding=(4, 4, 5, 5))
         # setting_labelframe.pack(expand = True)
-        # setting_labelframe.place(x=120,y=30)
-
-        
+        # setting_labelframe.place(x=120,y=30)        
         # connect_button = ttk.Button(setting_labelframe, text="Connect", 
         #                             style='Outline.TButton',command=lambda: connect_to_res())
         # connect_button.grid(row=0, column=1, sticky='ew', padx=4, pady=2)
         
         """Connect Frame SMU and Electrometer"""
         connect_all_button = ttk.Button(connect_Frame, text= "Keithley 6517A and SMU 2450", 
-                                        #bootstyle = DARK,
                                         style='Outline.TButton', 
                                         command=lambda: connect_to_all())
-        connect_all_button.grid(row=0, column=2, padx=4, pady=2)
-             
-
+        connect_all_button.grid(row=2, column=0, padx=4, pady=2)
+        
+        """Connect Frame SMU 1 and SMU 2"""
+        connect_all_button = ttk.Button(connect_Frame, text= "SMU 2450, Nr. xxx and SMU 2450, Nr. 041", 
+                                        #bootstyle = DARK,
+                                        style='Outline.TButton', 
+                                        command=lambda: connect_to_all_res())
+        connect_all_button.grid(row=2, column=1, padx=4, pady=2)             
+        
 
         """Measurement Frame with Timespan and Stop condition"""
         Start_Stop_Frame = ttk.Labelframe(self, text='Measurement', padding=(4, 4, 5, 5))
         Start_Stop_Frame.pack(expand = True)
-        Start_Stop_Frame.place(x=20,y=100)
+        Start_Stop_Frame.place(x=20, y=225)
 
         timespan_label = ttk.Label(Start_Stop_Frame, text= "Timespan in seconds", style="BW.TLabel")
         timespan_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
@@ -160,7 +168,7 @@ class PlotPage(tk.Frame):
         """Save Frame"""
         save_frame =  ttk.Labelframe(self, text='Save Settings', padding=(4, 4, 5, 5))
         save_frame.pack(expand=True)
-        save_frame.place(x=20,y=250)
+        save_frame.place(x=1230, y=200)
 
         setting_file_label = ttk.Label(save_frame, text= "Filename", style="BW.TLabel")
         setting_file_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
@@ -180,12 +188,17 @@ class PlotPage(tk.Frame):
                                  style='Outline.TButton',command=lambda: save_data_lad())
         save_button_lad.grid(row=4, column=0, sticky='ew', padx=4, pady=2)
         
+        """Clear Button """
+        zero_check_button = ttk.Button(self, text= "Clear Plot", 
+                                       style="Outline.TButton", 
+                                       command=lambda: clear_plot())
+        zero_check_button.place(x=650, y=350)
         
         """Settings for the Electrometer"""
         setting_labelframe_electrometer = ttk.Labelframe(self, text= "Keiythely 6517A", 
                                                          padding=(4, 4, 5, 5))
         setting_labelframe_electrometer.pack(expand = True)
-        setting_labelframe_electrometer.place(x=1130,y=550)
+        setting_labelframe_electrometer.place(x=745, y=45)
 
         zero_check_button = ttk.Button(setting_labelframe_electrometer, text= "Zero-check", 
                                        style='Outline.TButton',command=lambda: Zero_check())
@@ -197,63 +210,103 @@ class PlotPage(tk.Frame):
                                                command=lambda: reset_electrometer())
         reset_electrometer_button.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
         
-        """Settings for the Sourcemeter"""
-        setting_labelframe_sourcemeter = ttk.Labelframe(self, text= "Keiythely 2450", 
-                                                        padding=(4, 4, 5, 5))
-        setting_labelframe_sourcemeter.pack(expand = True)
-        setting_labelframe_sourcemeter.place(x=825,y=550)
+        """Settings for the Sourcemeter 2450, Nr. xxx"""  
+        smu_labeframe = ttk.Labelframe(self, 
+                                       text= "Keithely SMU 2450, Nr. xxx",
+                                       padding=(4, 4, 5, 5))
+        smu_labeframe.pack(expand = True)
+        smu_labeframe.place(x=855, y=45)
 
-        on_button = ttk.Button(setting_labelframe_sourcemeter, text= "Output ON", 
+        on_button = ttk.Button(smu_labeframe, text= "Output ON", 
                                style='Outline.TButton',command=lambda: output_on())
         on_button.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
         
-        off_button = ttk.Button(setting_labelframe_sourcemeter, text= "Output OFF", 
+        off_button = ttk.Button(smu_labeframe, text= "Output OFF", 
                                 style='Outline.TButton',command=lambda: output_off())
         off_button.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
 
-        reset_sourcemeter_button = ttk.Button(setting_labelframe_sourcemeter, text= "Reset", 
+        reset_sourcemeter_button = ttk.Button(smu_labeframe, text= "Reset", 
                                               style='Outline.TButton',
                                               command=lambda: reset_sourcemeter())
         reset_sourcemeter_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
         
-        voltage_mode_button = ttk.Button(setting_labelframe_sourcemeter, text= "Measure Voltage",
+        voltage_mode_button = ttk.Button(smu_labeframe, text= "Measure Voltage",
                                          style='Outline.TButton',command=lambda: voltage_mode())
         voltage_mode_button.grid(row=0, column =1, sticky='ew',padx=4,pady=2)    
     
-        current_mode_button = ttk.Button(setting_labelframe_sourcemeter, text= "Measure Current",
+        current_mode_button = ttk.Button(smu_labeframe, text= "Measure Current",
                                          style='Outline.TButton',command=lambda: current_mode())
         current_mode_button.grid(row=1, column =1, sticky='ew',padx=4,pady=2)
         
-        resistance_2wire_mode_button = ttk.Button(setting_labelframe_sourcemeter, 
+        resistance_2wire_mode_button = ttk.Button(smu_labeframe, 
                                                   text= "Measure Resistance 2-Wire", 
                                                   style='Outline.TButton', 
                                                   command=lambda: resistance_2wire_mode())
         resistance_2wire_mode_button.grid(row=2, column = 1,sticky='ew',padx=4,pady=2)
         
-        resistance_4wire_mode_button = ttk.Button(setting_labelframe_sourcemeter, 
+        resistance_4wire_mode_button = ttk.Button(smu_labeframe, 
                                                   text= "Measure Resistance 4-Wire", 
                                                   style='Outline.TButton', 
                                                   command=lambda: resistance_4wire_mode())
         resistance_4wire_mode_button.grid(row=3, column = 1,sticky='ew',padx=4,pady=2)
         
-        """Global settings """
-        zero_check_button = ttk.Button(self, text= "Clear Plot", 
-                                       style="Outline.TButton", 
-                                       command=lambda: clear_plot())
-        zero_check_button.place(x=1140, y=50)
+        """Settings for the Sourcemeter 2450, Nr. 041"""  
+        smu2_labeframe = ttk.LabelFrame(self,
+                                       text="Keithely SMU 2450, Nr. 041",
+                                       padding=(4,4,5,5))
+        smu2_labeframe.pack(expand=True)
+        smu2_labeframe.place(x=1125, y=45)
+        
+        on_button = ttk.Button(smu2_labeframe, text= "Output ON", 
+                               style='Outline.TButton',command=lambda: output_on2())
+        on_button.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
+        
+        off_button = ttk.Button(smu2_labeframe, text= "Output OFF", 
+                                style='Outline.TButton',command=lambda: output_off2())
+        off_button.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
 
+        reset_sourcemeter_button = ttk.Button(smu2_labeframe, text= "Reset", 
+                                              style='Outline.TButton',
+                                              command=lambda: reset_sourcemeter2())
+        reset_sourcemeter_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
+        
+        voltage_mode_button = ttk.Button(smu2_labeframe, text= "Measure Voltage",
+                                          style='Outline.TButton',command=lambda: voltage_mode2())
+        voltage_mode_button.grid(row=0, column =2, sticky='ew',padx=4,pady=2)
+    
+        current_mode_button = ttk.Button(smu2_labeframe, text= "Measure Current",
+                                          style='Outline.TButton',command=lambda: current_mode2())
+        current_mode_button.grid(row=1, column =2, sticky='ew',padx=4,pady=2)
+        
+        resistance_2wire_mode_button = ttk.Button(smu2_labeframe, 
+                                                  text= "Measure Resistance 2-Wire", 
+                                                  style='Outline.TButton', 
+                                                  command=lambda: resistance_2wire_mode2())
+        resistance_2wire_mode_button.grid(row=2, column = 2,sticky='ew',padx=4,pady=2)
+        
+        resistance_4wire_mode_button = ttk.Button(smu2_labeframe, 
+                                                  text= "Measure Resistance 4-Wire", 
+                                                  style='Outline.TButton', 
+                                                  command=lambda: resistance_4wire_mode2())
+        resistance_4wire_mode_button.grid(row=3, column = 2,sticky='ew',padx=4,pady=2)
+        
+        """Global settings """
         global status_label
         status_label = ttk.Label(self,text="Status: ", 
                                  style="BW.TLabel",font=("Arial", 15))
-        status_label.place(x= 800,y =10)
+        status_label.place(x= 20,y =10)
 
 
 
-        global rm, inst, rmu_smu, inst_smu, state, title, ylabel
+        global rm, inst, rmu_smu, inst_smu, rmu_smu2, inst_smu2
+        global state, state2, title, ylabel, title2, ylabel2
         
         state = 4
+        state2 = 4
         title = "Resistance"
         ylabel = "Resistance R"
+        title2 = "Resistance"
+        ylabel2 = "Resistance R"
 
 
         def connect_to_electrometer():
@@ -274,7 +327,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Electrometer: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 10, y = 630)
+            info_label.place(x = 450, y = 0)
         
         def connect_to_smu():
             global rm_smu, inst_smu
@@ -289,7 +342,21 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 10, y = 660)
+            info_label.place(x = 450, y = 10)
+            
+        def connect_to_smu2():
+            global rm_smu2, inst_smu2
+            rmu_smu2 = ResourceManager()
+            inst_smu2 = rmu_smu2.open_resource('USB0::0x05E6::0x2450::04030284::INSTR')
+            inst_smu2.timeout = 9600  #increased timeout from default of 2000
+            sleep(1)
+            inf = inst_smu2.query("*IDN?")
+            print(inf)
+
+
+            info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
+                                   style="BW.TLabel",font=("Arial", 10))
+            info_label.place(x = 650, y = 10)
 
         def connect_to_lad():
             global cond_lad
@@ -300,18 +367,38 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Connected to 6517A", 
                                      style="BW.TLabel", font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             
         def connect_to_res():
             global cond_res
             cond_res = True
-            #connect_to_electrometer()
             connect_to_smu()
 
             global status_label
-            status_label = ttk.Label(self,text="Status: Connected to SMU2450", 
+            status_label = ttk.Label(self,text="Status: Connected to SMU2450, Nr. xxx", 
                                      style="BW.TLabel", font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
+        
+        def connect_to_res2():
+            global cond_res
+            cond_res = True
+            connect_to_smu2()
+
+            global status_label
+            status_label = ttk.Label(self,text="Status: Connected to SMU2450, Nr.041", 
+                                     style="BW.TLabel", font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+        
+        def connect_to_all_res():
+            global cond_res2
+            cond_res = True
+            connect_to_smu()
+            connect_to_smu2()
+
+            global status_label
+            status_label = ttk.Label(self,text="Status: Connected to SMU2450, Nr.xxx and SMU2450, Nr.041", 
+                                     style="BW.TLabel", font=("Arial", 15))
+            status_label.place(x= 20,y =10)
             
         def connect_to_all():
             global cond_all
@@ -322,7 +409,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Connected to SMU2450 & 6517A", 
                                      style="BW.TLabel", font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             
             
         """ Electrometer Settings """
@@ -332,7 +419,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Zero-checked", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             inst.write(':SYSTem:ZCHeck off')
         
         def reset_electrometer():
@@ -343,7 +430,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Reset", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
 
         """Sourcemeter Settings """
         def output_on():
@@ -352,7 +439,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Output set",
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
         
         def output_off():
             "Set the output of the Sourcemeter to ON"
@@ -360,7 +447,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Output set  ON",
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             
         def reset_sourcemeter():
             "Reset the Sourcemeter"
@@ -368,17 +455,17 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Sourcemeter resetted",
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             
         def voltage_mode():
             global state, title, ylabel
             "Set to voltage-measurment"
             inst_smu.write('MEAS:VOLT?')
-            self.after(1, output_on)
+            self.after(2, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to Voltage Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             state = 0
             title = 'Voltage'
             ylabel = 'Voltage V'
@@ -388,11 +475,11 @@ class PlotPage(tk.Frame):
             global state, title, ylabel
             "Set to current-measurement"
             inst_smu.write('MEAS:CURR?')
-            self.after(1, output_on)
+            self.after(2, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to Current Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             state = 1
             title = 'Current'
             ylabel = 'Current A'
@@ -403,11 +490,11 @@ class PlotPage(tk.Frame):
             "Set to 2 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN OFF')
-            self.after(1, output_on)
+            self.after(2, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to 2 Wire Resistance Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             state = 2
             title = 'Resistance'
             ylabel = 'Resistance R'
@@ -419,14 +506,98 @@ class PlotPage(tk.Frame):
             "Set to 4 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN ON')
-            self.after(1, output_on)
+            self.after(2, output_on)
             global status_label
             status_label = ttk.Label(self,text="Status: Set to 4 Wire Resistance Measurement", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             state = 3
             title = 'Resistance'
             ylabel = 'Resistance R'
+            self.after(1,clear_plot)
+        
+        """Sourcemeter 2450, Nr041 Settings """
+        def output_on2():
+            "Set the output of the Sourcemeter to ON"
+            inst_smu2.write(':OUTP ON')
+            global status_label
+            status_label = ttk.Label(self,text="Status: Output set ON",
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+        
+        def output_off2():
+            "Set the output of the Sourcemeter to ON"
+            inst_smu2.write(':OUTP OFF')
+            global status_label
+            status_label = ttk.Label(self,text="Status: Output set OFF",
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            
+        def reset_sourcemeter2():
+            "Reset the Sourcemeter"
+            inst_smu2.write('*RST')
+            global status_label
+            status_label = ttk.Label(self,text="Status: Sourcemeter resetted",
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            
+        def voltage_mode2():
+            global state2, title2, ylabel2
+            "Set to voltage-measurment"
+            inst_smu2.write('MEAS:VOLT?')
+            self.after(2, output_on2)
+            global status_label
+            status_label = ttk.Label(self,text="Status: Set to Voltage Measurement", 
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            state2 = 0
+            title2 = 'Voltage'
+            ylabel2 = 'Voltage V'
+            self.after(1,clear_plot)
+            
+        def current_mode2():
+            global state2, title2, ylabel2
+            "Set to current-measurement"
+            inst_smu2.write('MEAS:CURR?')
+            self.after(2, output_on2)
+            global status_label
+            status_label = ttk.Label(self,text="Status: Set to Current Measurement", 
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            state2 = 1
+            title2 = 'Current'
+            ylabel2 = 'Current A'
+            self.after(1,clear_plot)
+            
+        def resistance_2wire_mode2():
+            global state2, title2, ylabel2
+            "Set to 2 Wire resistance mesurement"
+            inst_smu2.write('MEAS:RES?')
+            inst_smu2.write(':SENS:RES:RSEN OFF')
+            self.after(2, output_on2)
+            global status_label
+            status_label = ttk.Label(self,text="Status: Set to 2 Wire Resistance Measurement", 
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            state2 = 2
+            title2 = 'Resistance'
+            ylabel2 = 'Resistance R'
+            self.after(1,clear_plot)
+            
+            
+        def resistance_4wire_mode2():
+            global state2, title2, ylabel2
+            "Set to 4 Wire resistance mesurement"
+            inst_smu2.write('MEAS:RES?')
+            inst_smu2.write(':SENS:RES:RSEN ON')
+            self.after(2, output_on2)
+            global status_label
+            status_label = ttk.Label(self,text="Status: Set to 4 Wire Resistance Measurement", 
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            state2 = 3
+            title2 = 'Resistance'
+            ylabel2 = 'Resistance R'
             self.after(1,clear_plot)
         
         global timespan, start_timespan
@@ -449,7 +620,7 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text="Status: Live measurement started", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
             self.after(1,plotting)
 
         def plot_stop():
@@ -461,15 +632,17 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text= "Status: End of live measurement", 
                                      style= "BW.TLabel", font= ("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
         
         
         """Saving Data Together and individually """
-        global plot_lad, plot_res, plot_smu, plot_elec, plot_time
+        global plot_lad, plot_res, plot_res2, plot_time
+        global plot_smu, plot_smu2, plot_elec
         
         plot_time = list()
         plot_lad = list()
         plot_res = list()
+        plot_res2 = list()
 
         def save_data_lad():
             """Save measured Data"""
@@ -481,18 +654,27 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text= "Status: Data Saved", 
                                      style="BW.TLabel", font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
         
         def save_data_res():
             "Save measured Data from the SMU"
-            global plot_res, state
+            global plot_res, state, state2
+            
+            text = 'Zeit'
             
             if state == 0:
-                text = 'Spannung in Volt'
+                text = text + 'Spannung in Volt'
             elif state == 1:
-                text = 'Strom in Ampere'
+                text = text + 'Strom in Ampere'
             elif state == 2 or state == 3:
-                text = 'Widerstand in Ohm'
+                text = text + 'Widerstand in Ohm'
+            
+            if state2 == 0:
+                text = text + 'Spannung in Volt'
+            elif state2 == 1:
+                text = text + 'Strom in Ampere'
+            elif state2 == 2 or state2 == 3:
+                text = text + 'Widerstand in Ohm'
                 
             np.savetxt(setting_file_entry.get()+str(".csv"), 
                        np.transpose(np.array([plot_time,plot_res])), 
@@ -500,30 +682,33 @@ class PlotPage(tk.Frame):
             global status_label
             status_label = ttk.Label(self,text= "Status: Data Saved", 
                                      style="BW.TLabel", font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
         
         def save_data_all():
             """Save the data"""
-            global plot_lad, plot_res
+            global plot_lad, plot_res, plot_res2
+            
             np.savetxt(setting_file_entry.get()+str(".csv"), 
-                       np.transpose(np.array([plot_time, plot_lad, plot_res])), 
+                       np.transpose(np.array([plot_time, plot_lad, plot_res, plot_res2])), 
                        delimiter= ",", fmt="%s")
 
             global status_label
             status_label = ttk.Label(self,text="Status: Data Saved", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
 
         def clear_plot():
 
             """Clear the electrometer plot"""
             global plot_elec, plot_lad
             global plot_smu, plot_res
+            global plot_smu2, plot_res2
             global title, ylabel, state
+            global title2, ylabel2, state2
             global plot_time
             
             plot_frame_lad = ttk.Frame(self)
-            plot_frame_lad.place(x=250,y=150)
+            plot_frame_lad.place(x=20,y=380)
 
             f_lad = None
             a_lad = None
@@ -534,7 +719,7 @@ class PlotPage(tk.Frame):
             plot_lad = list()
 
             plot_frame_res = ttk.Frame(self)
-            plot_frame_res.place(x=700,y=150)
+            plot_frame_res.place(x=475,y=380)
 
             f_res = None
             a_res = None
@@ -549,18 +734,37 @@ class PlotPage(tk.Frame):
             
             plot_res = list()
             
+            plot_frame_res2 = ttk.Frame(self)
+            plot_frame_res2.place(x=930,y=380)
+            
+            f_res2=None
+            a_res2=None
+            canvas_res2=None
+
+            if state2 == 0:
+                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+            elif state2 == 1:
+                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+            elif state2 == 2 or state2 == 3:
+                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+            else:
+                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+            
+            plot_res2 = list()
+            
             plot_time = list()
 
 
             global status_label
             status_label = ttk.Label(self,text="Status: Plot cleared", 
                                      style="BW.TLabel",font=("Arial", 15))
-            status_label.place(x= 800,y =10)
+            status_label.place(x= 20,y =10)
         
         
         def plotting():
-            global cond, cond_all, cond_lad, cond_res
-            global plot_smu, plot_elec, plot_lad, plot_res
+            global cond, cond_all, cond_all_res, cond_lad, cond_res
+            global plot_smu, plot_elec, plot_smu2 
+            global plot_lad, plot_res, plot_res2
             global start, timespan, start_timespan, data
             global plot_time
             
@@ -585,6 +789,20 @@ class PlotPage(tk.Frame):
                     plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
                     
                     self.after(1,plotting)
+                
+                # if cond_all_res == True:
+                #     data_res = inst_smu.query(':READ?')
+                #     data_res2 = inst_smu2.query(':READ?')
+                    
+                #     data_to_float_res = split_data(data_res)
+                #     data_to_float_res2 = split_data(data_res2)
+                #     plot_res.append(data_to_float_res)
+                #     plot_res2.append(data_to_float_res2)
+                #     plot_time.append(datetime().now().isoformat(timespec='microseconds'))
+                    
+                #     plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                #     plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res2)   
+                #     self.after(1,plotting)
                     
                 if cond_all == True:
                     data_res = inst.query(':READ?')
@@ -605,7 +823,11 @@ class PlotPage(tk.Frame):
         
         
         plot_frame_lad = ttk.Frame(self)
-        plot_frame_lad.place(x=250,y=150)
+        plot_frame_lad.place(x=20, y=380)
+        global plot_label_lad
+        plot_label_lad = ttk.Label(self,text="Plot vom Keithley 6517A", 
+                                 style="BW.TLabel",font=("Arial", 15))
+        plot_label_lad.place(x=20, y=745)
 
         f_lad=None
         a_lad=None
@@ -614,7 +836,11 @@ class PlotPage(tk.Frame):
         plot_elec = data_plot(plot_frame_lad, 90, f_lad, a_lad, canvas_lad)
 
         plot_frame_res = ttk.Frame(self)
-        plot_frame_res.place(x=700,y=150)
+        plot_frame_res.place(x=475, y=380)
+        global plot_label_res
+        plot_label_res = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. xxx", 
+                                  style="BW.TLabel",font=("Arial", 15))
+        plot_label_res.place(x=475, y=745)
 
         f_res=None
         a_res=None
@@ -629,6 +855,25 @@ class PlotPage(tk.Frame):
         else:
             plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
         
+        plot_frame_res2 = ttk.Frame(self)
+        plot_frame_res2.place(x=930,y=380)
+        global plot_label_res2
+        plot_label_res2 = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. 041", 
+                                 style="BW.TLabel",font=("Arial", 15))
+        plot_label_res2.place(x= 930,y =745)
+
+        f_res2=None
+        a_res2=None
+        canvas_res2=None
+
+        if state2 == 0:
+            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        elif state2 == 1:
+            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        elif state2 == 2 or state2 == 3:
+            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        else:
+            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
     
         def split_data(data):
             x = data.split(',')
