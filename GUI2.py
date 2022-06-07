@@ -1,17 +1,23 @@
-import tkinter as tk
+"""UI libraries"""
+import tkinter as tk  
 from tkinter import ttk
 from ttkbootstrap import Style
 import ttkbootstrap
 from tkinter import *
+
+"""Help functions """
 from design_functions import *
 
 import serial as sr
 import serial.tools.list_ports
 import threading
+
 from datetime import datetime
 
+"""Visa Communication libraries"""
 import pyvisa as visa
 from pyvisa.highlevel import ResourceManager
+
 import numpy as np
 import time
 from time import sleep
@@ -99,7 +105,7 @@ class PlotPage(tk.Frame):
         connect_Frame.pack(expand=True)
         connect_Frame.place(x=20, y=45)
         
-        "Connect Frame Keithley 6517A"
+        """Connect Frame Keithley 6517A"""
         connect_lad_button = ttk.Button(connect_Frame, text= "Keithley 6517A", 
                                         style='Outline.TButton', 
                                         command=lambda: connect_to_lad())
@@ -897,7 +903,7 @@ class PlotPage(tk.Frame):
                     self.after(1,plotting)
                     
         
-        
+        """Plot Frame"""
         plot_frame_lad = ttk.Frame(self)
         plot_frame_lad.place(x=20, y=380)
         global plot_label_lad
