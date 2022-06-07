@@ -10,4 +10,4 @@ Before you use the standalone directory please make sure you have installed visa
 You can use the .py files with a common Python IDE or use the standalone directory if you don't want to have headache with Python. There you have to need to open the .exe file.
 
 ## Standalone version 
-Because the directory is to big you can find it here: https://drive.google.com/file/d/1UHgXZzEA6csgUZ8LOSXpgEESPDr2BRAR/view?usp=sharing
+Because the directory is to big you can find it here: 
