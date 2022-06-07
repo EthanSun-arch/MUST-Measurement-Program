@@ -168,7 +168,7 @@ class PlotPage(tk.Frame):
         """Save Frame"""
         save_frame =  ttk.Labelframe(self, text='Save Settings', padding=(4, 4, 5, 5))
         save_frame.pack(expand=True)
-        save_frame.place(x=1230, y=200)
+        save_frame.place(x=1015, y=200)
 
         setting_file_label = ttk.Label(save_frame, text= "Filename", style="BW.TLabel")
         setting_file_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
@@ -176,9 +176,13 @@ class PlotPage(tk.Frame):
         setting_file_entry = ttk.Entry(save_frame)
         setting_file_entry.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
 
-        save_button = ttk.Button(save_frame, text= "Save everything in one", 
+        save_button = ttk.Button(save_frame, text= "Save everything with Charge", 
                                  style='Outline.TButton',command=lambda: save_data_all())
         save_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
+        
+        save_button_all_res = ttk.Button(save_frame, text= "Save everything without Charge", 
+                                 style='Outline.TButton',command=lambda: save_data_all_res())
+        save_button_all_res.grid(row=2, column=1, sticky='ew', padx=4, pady=2)
         
         save_button_res = ttk.Button(save_frame, text= "Save only Resistance", 
                                  style='Outline.TButton',command=lambda: save_data_res())
@@ -186,7 +190,7 @@ class PlotPage(tk.Frame):
         
         save_button_lad = ttk.Button(save_frame, text= "Save only Charge", 
                                  style='Outline.TButton',command=lambda: save_data_lad())
-        save_button_lad.grid(row=4, column=0, sticky='ew', padx=4, pady=2)
+        save_button_lad.grid(row=3, column=1, sticky='ew', padx=4, pady=2)
         
         """Clear Button """
         zero_check_button = ttk.Button(self, text= "Clear Plot", 
@@ -300,9 +304,11 @@ class PlotPage(tk.Frame):
 
         global rm, inst, rmu_smu, inst_smu, rmu_smu2, inst_smu2
         global state, state2, title, ylabel, title2, ylabel2
+        global test_var
         
         state = 4
         state2 = 4
+        test_var = 2
         title = "Resistance"
         ylabel = "Resistance R"
         title2 = "Resistance"
@@ -370,8 +376,9 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
             
         def connect_to_res():
-            global cond_res
+            global cond_res, test_var
             cond_res = True
+            test_var = 0
             connect_to_smu()
 
             global status_label
@@ -380,8 +387,9 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
         
         def connect_to_res2():
-            global cond_res
+            global cond_res, test_var
             cond_res = True
+            test_var = 1
             connect_to_smu2()
 
             global status_label
@@ -390,8 +398,8 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
         
         def connect_to_all_res():
-            global cond_res2
-            cond_res = True
+            global cond_all_res
+            cond_all_res = True
             connect_to_smu()
             connect_to_smu2()
 
@@ -659,26 +667,34 @@ class PlotPage(tk.Frame):
         def save_data_res():
             "Save measured Data from the SMU"
             global plot_res, state, state2
+            global test_var
             
-            text = 'Zeit'
+            text = 'Zeit [Datum+T+Zeit],'
             
-            if state == 0:
-                text = text + 'Spannung in Volt'
-            elif state == 1:
-                text = text + 'Strom in Ampere'
-            elif state == 2 or state == 3:
-                text = text + 'Widerstand in Ohm'
-            
-            if state2 == 0:
-                text = text + 'Spannung in Volt'
-            elif state2 == 1:
-                text = text + 'Strom in Ampere'
-            elif state2 == 2 or state2 == 3:
-                text = text + 'Widerstand in Ohm'
+            if test_var ==0:
+                if state == 0:
+                    text = text + ' Spannung [Volt],'
+                elif state == 1:
+                    text = text + ' Strom [Ampere],'
+                elif state == 2 or state == 3:
+                    text = text + ' Widerstand [Ohm],'
                 
-            np.savetxt(setting_file_entry.get()+str(".csv"), 
-                       np.transpose(np.array([plot_time,plot_res])), 
-                       delimiter= ",", fmt="%s",header= text)
+                np.savetxt(setting_file_entry.get()+str(".csv"), 
+                           np.transpose(np.array([plot_time, plot_res])), 
+                           delimiter= ",", fmt="%s",header= text)
+                
+            elif test_var == 1:
+                if state2 == 0:
+                    text = text + ' Spannung [Volt],'
+                elif state2 == 1:
+                    text = text + ' Strom [Ampere],'
+                elif state2 == 2 or state2 == 3:
+                    text = text + ' Widerstand [Ohm],'
+                
+                np.savetxt(setting_file_entry.get()+str(".csv"), 
+                           np.transpose(np.array([plot_time, plot_res])), 
+                           delimiter= ",", fmt="%s",header= text)
+                
             global status_label
             status_label = ttk.Label(self,text= "Status: Data Saved", 
                                      style="BW.TLabel", font=("Arial", 15))
@@ -687,10 +703,57 @@ class PlotPage(tk.Frame):
         def save_data_all():
             """Save the data"""
             global plot_lad, plot_res, plot_res2
+            global state, state2
+            
+            text = 'Zeit [Datum+T+Zeit],'
+            
+            if state == 0:
+                text = text + ' Spannung [Volt],'
+            elif state == 1:
+                text = text + ' Strom [Ampere],'
+            elif state == 2 or state == 3:
+                text = text + ' Widerstand [Ohm],'
+            
+            if state2 == 0:
+                text = text + ' Spannung [Volt]'
+            elif state2 == 1:
+                text = text + ' Strom [Ampere]'
+            elif state2 == 2 or state2 == 3:
+                text = text + ' Widerstand [Ohm]'
             
             np.savetxt(setting_file_entry.get()+str(".csv"), 
                        np.transpose(np.array([plot_time, plot_lad, plot_res, plot_res2])), 
-                       delimiter= ",", fmt="%s")
+                       delimiter= ",", fmt="%s", header= text)
+
+            global status_label
+            status_label = ttk.Label(self,text="Status: Data Saved", 
+                                     style="BW.TLabel",font=("Arial", 15))
+            status_label.place(x= 20,y =10)
+            
+        def save_data_all_res():
+            """Save the data"""
+            global plot_res, plot_res2
+            global state, state2
+            
+            text = 'Zeit [Datum+T+Zeit],'
+            
+            if state == 0:
+                text = text + ' Spannung [Volt],'
+            elif state == 1:
+                text = text + ' Strom [Ampere],'
+            elif state == 2 or state == 3:
+                text = text + ' Widerstand [Ohm],'
+            
+            if state2 == 0:
+                text = text + ' Spannung [Volt]'
+            elif state2 == 1:
+                text = text + ' Strom [Ampere]'
+            elif state2 == 2 or state2 == 3:
+                text = text + ' Widerstand [Ohm]'
+            
+            np.savetxt(setting_file_entry.get()+str(".csv"), 
+                       np.transpose(np.array([plot_time, plot_res, plot_res2])), 
+                       delimiter= ",", fmt="%s", header= text)
 
             global status_label
             status_label = ttk.Label(self,text="Status: Data Saved", 
@@ -731,6 +794,8 @@ class PlotPage(tk.Frame):
                 plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
             elif state == 2 or state == 3:
                 plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+            else:
+                plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
             
             plot_res = list()
             
@@ -763,6 +828,7 @@ class PlotPage(tk.Frame):
         
         def plotting():
             global cond, cond_all, cond_all_res, cond_lad, cond_res
+            global test_var
             global plot_smu, plot_elec, plot_smu2 
             global plot_lad, plot_res, plot_res2
             global start, timespan, start_timespan, data
@@ -782,27 +848,37 @@ class PlotPage(tk.Frame):
                     self.after(1,plotting)
                     
                 if cond_res == True:
-                    data_res = inst_smu.query(':READ?')
-                    data_to_float_res = split_data(data_res)
-                    plot_res.append(data_to_float_res)
-                    plot_time.append(datetime.now().isoformat(timespec='microseconds'))
-                    plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                    if test_var == 0:    
+                        data_res = inst_smu.query(':READ?')
+                        data_to_float_res = split_data(data_res)
+                        plot_res.append(data_to_float_res)
+                        plot_time.append(datetime.now().isoformat(timespec='microseconds'))
+                        plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                        
+                        self.after(1,plotting)
                     
-                    self.after(1,plotting)
+                    if test_var == 1:    
+                        data_res = inst_smu2.query(':READ?')
+                        data_to_float_res = split_data(data_res)
+                        plot_res.append(data_to_float_res)
+                        plot_time.append(datetime.now().isoformat(timespec='microseconds'))
+                        plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res)
+                        
+                        self.after(1,plotting)
                 
-                # if cond_all_res == True:
-                #     data_res = inst_smu.query(':READ?')
-                #     data_res2 = inst_smu2.query(':READ?')
+                if cond_all_res == True:
+                    data_res = inst_smu.query(':READ?')
+                    data_res2 = inst_smu2.query(':READ?')
                     
-                #     data_to_float_res = split_data(data_res)
-                #     data_to_float_res2 = split_data(data_res2)
-                #     plot_res.append(data_to_float_res)
-                #     plot_res2.append(data_to_float_res2)
-                #     plot_time.append(datetime().now().isoformat(timespec='microseconds'))
+                    data_to_float_res = split_data(data_res)
+                    data_to_float_res2 = split_data(data_res2)
+                    plot_res.append(data_to_float_res)
+                    plot_res2.append(data_to_float_res2)
+                    plot_time.append(datetime.now().isoformat(timespec='microseconds'))
                     
-                #     plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
-                #     plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res2)   
-                #     self.after(1,plotting)
+                    plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                    plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res2)   
+                    self.after(1,plotting)
                     
                 if cond_all == True:
                     data_res = inst.query(':READ?')
