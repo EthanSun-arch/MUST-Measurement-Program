@@ -35,8 +35,6 @@ data_smu = data_smu
 data_smu['Time'] = pd.to_datetime(data_smu['Time'])
 firstValue = data_smu['Time'].iloc[0]
 data_smu['Time'] = data_smu['Time'] - firstValue
-# for i in range(len(data_smu['Time'])):
-#     data_smu['Time'][i] = data_smu['Time'][i].total_seconds()
 
 #%%
 """Importing the x and y data """
