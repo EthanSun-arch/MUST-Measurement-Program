@@ -6,7 +6,7 @@ import ttkbootstrap
 from tkinter import *
 
 """Help functions """
-from design_functions import *
+# from design_functions import *
 
 import serial as sr
 import serial.tools.list_ports
@@ -22,6 +22,15 @@ import numpy as np
 import time
 from time import sleep
 
+
+def isfloat(value):
+  try:
+    float(value)
+    return True
+  except ValueError:
+    return False
+
+
 global cond, cond_all, cond_all_res, cond_res, cond_lad
 
 class Main_page(tk.Tk):
@@ -34,7 +43,7 @@ class Main_page(tk.Tk):
         """Settings of the GUI-basics: geometry, title"""
         self.title('Sourcemeter und Elektrometer Messung')
         self.style = Style('darkly')
-        self.geometry('1400x800') 
+        self.geometry('700x700') 
 
 
         """Set a frame that contains the different classes of the software (Pages)"""
@@ -85,7 +94,7 @@ class StartPage(tk.Frame):
         start_button = ttk.Button(self, text= "Messung",
                                   style= "Outline.TButton", 
                                   command=lambda: controller.show_frame(PlotPage))
-        start_button.place(x = 675, y = 400)
+        start_button.place(x = 325, y = 350)
 
 class PlotPage(tk.Frame):
     """Represents the first page (Start page) of the GUI"""
@@ -151,81 +160,12 @@ class PlotPage(tk.Frame):
                                         command=lambda: connect_to_all_res())
         connect_all_button.grid(row=2, column=1, padx=4, pady=2)             
         
-
-        """Measurement Frame with Timespan and Stop condition"""
-        Start_Stop_Frame = ttk.Labelframe(self, text='Measurement', padding=(4, 4, 5, 5))
-        Start_Stop_Frame.pack(expand = True)
-        Start_Stop_Frame.place(x=20, y=225)
-
-        timespan_label = ttk.Label(Start_Stop_Frame, text= "Timespan in seconds", style="BW.TLabel")
-        timespan_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
-
-        timespan_entry = ttk.Entry(Start_Stop_Frame)
-        timespan_entry.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
-
-        start_button = ttk.Button(Start_Stop_Frame, text="Start", 
-                                  style='Outline.TButton', command=lambda: plot_start())
-        start_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
-
-        stop_button = ttk.Button(Start_Stop_Frame, text="Stop(without Timespan)", 
-                                 style='Outline.TButton', command=lambda: plot_stop())
-        stop_button.grid(row=3, column=0, sticky='ew', padx=4, pady=2)
-
-        """Save Frame"""
-        save_frame =  ttk.Labelframe(self, text='Save Settings', padding=(4, 4, 5, 5))
-        save_frame.pack(expand=True)
-        save_frame.place(x=1015, y=200)
-
-        setting_file_label = ttk.Label(save_frame, text= "Filename", style="BW.TLabel")
-        setting_file_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
-
-        setting_file_entry = ttk.Entry(save_frame)
-        setting_file_entry.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
-
-        save_button = ttk.Button(save_frame, text= "Save everything with Charge", 
-                                 style='Outline.TButton',command=lambda: save_data_all())
-        save_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
-        
-        save_button_all_res = ttk.Button(save_frame, text= "Save everything without Charge", 
-                                 style='Outline.TButton',command=lambda: save_data_all_res())
-        save_button_all_res.grid(row=2, column=1, sticky='ew', padx=4, pady=2)
-        
-        save_button_res = ttk.Button(save_frame, text= "Save only Resistance", 
-                                 style='Outline.TButton',command=lambda: save_data_res())
-        save_button_res.grid(row=3, column=0, sticky='ew', padx=4, pady=2)
-        
-        save_button_lad = ttk.Button(save_frame, text= "Save only Charge", 
-                                 style='Outline.TButton',command=lambda: save_data_lad())
-        save_button_lad.grid(row=3, column=1, sticky='ew', padx=4, pady=2)
-        
-        """Clear Button """
-        zero_check_button = ttk.Button(self, text= "Clear Plot", 
-                                       style="Outline.TButton", 
-                                       command=lambda: clear_plot())
-        zero_check_button.place(x=650, y=350)
-        
-        """Settings for the Electrometer"""
-        setting_labelframe_electrometer = ttk.Labelframe(self, text= "Keiythely 6517A", 
-                                                         padding=(4, 4, 5, 5))
-        setting_labelframe_electrometer.pack(expand = True)
-        setting_labelframe_electrometer.place(x=745, y=45)
-
-        zero_check_button = ttk.Button(setting_labelframe_electrometer, text= "Zero-check", 
-                                       style='Outline.TButton',command=lambda: Zero_check())
-        zero_check_button.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
-
-
-        reset_electrometer_button = ttk.Button(setting_labelframe_electrometer, text= "Reset", 
-                                               style='Outline.TButton', 
-                                               command=lambda: reset_electrometer())
-        reset_electrometer_button.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
-        
         """Settings for the Sourcemeter 2450, Nr. xxx"""  
         smu_labeframe = ttk.Labelframe(self, 
                                        text= "Keithely SMU 2450, Nr. xxx",
                                        padding=(4, 4, 5, 5))
         smu_labeframe.pack(expand = True)
-        smu_labeframe.place(x=855, y=45)
+        smu_labeframe.place(x=20, y=175)
 
         on_button = ttk.Button(smu_labeframe, text= "Output ON", 
                                style='Outline.TButton',command=lambda: output_on())
@@ -265,7 +205,7 @@ class PlotPage(tk.Frame):
                                        text="Keithely SMU 2450, Nr. 041",
                                        padding=(4,4,5,5))
         smu2_labeframe.pack(expand=True)
-        smu2_labeframe.place(x=1125, y=45)
+        smu2_labeframe.place(x=300, y=175)
         
         on_button = ttk.Button(smu2_labeframe, text= "Output ON", 
                                style='Outline.TButton',command=lambda: output_on2())
@@ -300,25 +240,130 @@ class PlotPage(tk.Frame):
                                                   command=lambda: resistance_4wire_mode2())
         resistance_4wire_mode_button.grid(row=3, column = 2,sticky='ew',padx=4,pady=2)
         
+        """Settings for the Electrometer"""
+        setting_labelframe_electrometer = ttk.Labelframe(self, text= "Keiythely 6517A", 
+                                                         padding=(4, 4, 5, 5))
+        setting_labelframe_electrometer.pack(expand = True)
+        setting_labelframe_electrometer.place(x=575, y=175)
+
+        zero_check_button = ttk.Button(setting_labelframe_electrometer, text= "Zero-check", 
+                                       style='Outline.TButton',command=lambda: Zero_check())
+        zero_check_button.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
+
+
+        reset_electrometer_button = ttk.Button(setting_labelframe_electrometer, text= "Reset", 
+                                               style='Outline.TButton', 
+                                               command=lambda: reset_electrometer())
+        reset_electrometer_button.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
+        
+        """Measurement Frame with Timespan and Stop condition"""
+        Start_Stop_Frame = ttk.Labelframe(self, text='Measurement', padding=(4, 4, 5, 5))
+        Start_Stop_Frame.pack(expand = True)
+        Start_Stop_Frame.place(x=20, y=335)
+
+        timespan_label = ttk.Label(Start_Stop_Frame, text= "Timespan in seconds", style="BW.TLabel")
+        timespan_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
+
+        timespan_entry = ttk.Entry(Start_Stop_Frame)
+        timespan_entry.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
+
+        start_button = ttk.Button(Start_Stop_Frame, text="Start", 
+                                  style='Outline.TButton', command=lambda: plot_start())
+        start_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
+
+        stop_button = ttk.Button(Start_Stop_Frame, text="Stop(without Timespan)", 
+                                 style='Outline.TButton', command=lambda: plot_stop())
+        stop_button.grid(row=3, column=0, sticky='ew', padx=4, pady=2)
+
+        """Save Frame"""
+        save_frame =  ttk.Labelframe(self, text='Save Settings', padding=(4, 4, 5, 5))
+        save_frame.pack(expand=True)
+        save_frame.place(x=300, y=335)
+
+        setting_file_label = ttk.Label(save_frame, text= "Filename", style="BW.TLabel")
+        setting_file_label.grid(row=0, column=0, sticky='ew', padx=4, pady=2)
+
+        setting_file_entry = ttk.Entry(save_frame)
+        setting_file_entry.grid(row=1, column=0, sticky='ew', padx=4, pady=2)
+
+        save_button = ttk.Button(save_frame, text= "Save everything with Charge", 
+                                 style='Outline.TButton',command=lambda: save_data_all())
+        save_button.grid(row=2, column=0, sticky='ew', padx=4, pady=2)
+        
+        save_button_all_res = ttk.Button(save_frame, text= "Save everything without Charge", 
+                                 style='Outline.TButton',command=lambda: save_data_all_res())
+        save_button_all_res.grid(row=2, column=1, sticky='ew', padx=4, pady=2)
+        
+        save_button_res = ttk.Button(save_frame, text= "Save only Resistance", 
+                                 style='Outline.TButton',command=lambda: save_data_res())
+        save_button_res.grid(row=3, column=0, sticky='ew', padx=4, pady=2)
+        
+        save_button_lad = ttk.Button(save_frame, text= "Save only Charge", 
+                                 style='Outline.TButton',command=lambda: save_data_lad())
+        save_button_lad.grid(row=3, column=1, sticky='ew', padx=4, pady=2)
+        
+        """Clear Button """
+        zero_check_button = ttk.Button(self, text= "Clear Plot", 
+                                        style="Outline.TButton", 
+                                        command=lambda: clear_plot())
+        zero_check_button.place(x=400, y=500)
+        
         """Global settings """
         global status_label
         status_label = ttk.Label(self,text="Status: ", 
                                  style="BW.TLabel",font=("Arial", 15))
         status_label.place(x= 20,y =10)
+        
+        """Value Label Frame"""
+        global value0_label, value1_label, value2_label
+        value_labelframe = ttk.LabelFrame(self,
+                                          text= "Live values of the measurment unit",
+                                          padding =(4,4,5,5))
+        value_labelframe.place(x=20, y=500)
+        
+        smu_value_label = ttk.Label(value_labelframe,
+                                    text= "SMU, Nr. xxx; Value:",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        smu_value_label.grid(row=0, column=0)
+        
+        value0_label = ttk.Label(value_labelframe,
+                                    text= "0.000",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        value0_label.grid(row=0, column=1)
 
+        smu2_value_label = ttk.Label(value_labelframe,
+                                    text= "SMU, Nr. 041; Value:",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        smu2_value_label.grid(row=1, column=0)
+        
+        value1_label = ttk.Label(value_labelframe,
+                                    text= "0.000",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        value1_label.grid(row=1, column=1)
 
+        lad_value_label = ttk.Label(value_labelframe,
+                                    text= "Keiythely 6517A; Value:",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        lad_value_label.grid(row=2, column=0)
+        
+        value2_label = ttk.Label(value_labelframe,
+                                    text= "0.000",
+                                    style= "BW.TLabel",
+                                    font= ("Arial", 15))
+        value2_label.grid(row=2, column=1)
 
         global rm, inst, rmu_smu, inst_smu, rmu_smu2, inst_smu2
-        global state, state2, title, ylabel, title2, ylabel2
+        global state, state2
         global test_var
         
         state = 4
         state2 = 4
         test_var = 2
-        title = "Resistance"
-        ylabel = "Resistance R"
-        title2 = "Resistance"
-        ylabel2 = "Resistance R"
 
 
         def connect_to_electrometer():
@@ -339,7 +384,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Electrometer: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 450, y = 0)
+            info_label.place(x = 450, y = 600)
         
         def connect_to_smu():
             global rm_smu, inst_smu
@@ -354,7 +399,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 450, y = 10)
+            info_label.place(x = 450, y = 600)
             
         def connect_to_smu2():
             global rm_smu2, inst_smu2
@@ -368,7 +413,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 650, y = 10)
+            info_label.place(x = 650, y = 600)
 
         def connect_to_lad():
             global cond_lad
@@ -472,7 +517,7 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
             
         def voltage_mode():
-            global state, title, ylabel
+            global state
             "Set to voltage-measurment"
             inst_smu.write('MEAS:VOLT?')
             self.after(2, output_on)
@@ -481,12 +526,10 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state = 0
-            title = 'Voltage'
-            ylabel = 'Voltage V'
             self.after(1,clear_plot)
             
         def current_mode():
-            global state, title, ylabel
+            global state
             "Set to current-measurement"
             inst_smu.write('MEAS:CURR?')
             self.after(2, output_on)
@@ -495,12 +538,10 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state = 1
-            title = 'Current'
-            ylabel = 'Current A'
             self.after(1,clear_plot)
             
         def resistance_2wire_mode():
-            global state, title, ylabel
+            global state
             "Set to 2 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN OFF')
@@ -510,13 +551,11 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state = 2
-            title = 'Resistance'
-            ylabel = 'Resistance R'
             self.after(1,clear_plot)
             
             
         def resistance_4wire_mode():
-            global state, title, ylabel
+            global state
             "Set to 4 Wire resistance mesurement"
             inst_smu.write('MEAS:RES?')
             inst_smu.write(':SENS:RES:RSEN ON')
@@ -526,8 +565,6 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state = 3
-            title = 'Resistance'
-            ylabel = 'Resistance R'
             self.after(1,clear_plot)
         
         """Sourcemeter 2450, Nr041 Settings """
@@ -556,7 +593,7 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
             
         def voltage_mode2():
-            global state2, title2, ylabel2
+            global state2
             "Set to voltage-measurment"
             inst_smu2.write('MEAS:VOLT?')
             self.after(2, output_on2)
@@ -565,12 +602,10 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state2 = 0
-            title2 = 'Voltage'
-            ylabel2 = 'Voltage V'
             self.after(1,clear_plot)
             
         def current_mode2():
-            global state2, title2, ylabel2
+            global state2
             "Set to current-measurement"
             inst_smu2.write('MEAS:CURR?')
             self.after(2, output_on2)
@@ -579,12 +614,10 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state2 = 1
-            title2 = 'Current'
-            ylabel2 = 'Current A'
             self.after(1,clear_plot)
             
         def resistance_2wire_mode2():
-            global state2, title2, ylabel2
+            global state2
             "Set to 2 Wire resistance mesurement"
             inst_smu2.write('MEAS:RES?')
             inst_smu2.write(':SENS:RES:RSEN OFF')
@@ -594,13 +627,11 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state2 = 2
-            title2 = 'Resistance'
-            ylabel2 = 'Resistance R'
             self.after(1,clear_plot)
             
             
         def resistance_4wire_mode2():
-            global state2, title2, ylabel2
+            global state2
             "Set to 4 Wire resistance mesurement"
             inst_smu2.write('MEAS:RES?')
             inst_smu2.write(':SENS:RES:RSEN ON')
@@ -610,8 +641,6 @@ class PlotPage(tk.Frame):
                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
             state2 = 3
-            title2 = 'Resistance'
-            ylabel2 = 'Resistance R'
             self.after(1,clear_plot)
         
         global timespan, start_timespan
@@ -651,8 +680,9 @@ class PlotPage(tk.Frame):
         
         """Saving Data Together and individually """
         global plot_lad, plot_res, plot_res2, plot_time
-        global plot_smu, plot_smu2, plot_elec
+        global test
         
+        test = ''
         plot_time = list()
         plot_lad = list()
         plot_res = list()
@@ -767,78 +797,50 @@ class PlotPage(tk.Frame):
             status_label.place(x= 20,y =10)
 
         def clear_plot():
-
-            """Clear the electrometer plot"""
-            global plot_elec, plot_lad
-            global plot_smu, plot_res
-            global plot_smu2, plot_res2
-            global title, ylabel, state
-            global title2, ylabel2, state2
-            global plot_time
+            """Clear the value labels"""
+            global value0_label, value1_label, value2_label
+            global plot_res, plot_res2, plot_lad, plot_time
             
-            plot_frame_lad = ttk.Frame(self)
-            plot_frame_lad.place(x=20,y=380)
-
-            f_lad = None
-            a_lad = None
-            canvas_lad = None
-
+            value0_label = ttk.Label(value_labelframe,
+                                        text= "0.000",
+                                        style= "BW.TLabel",
+                                        font= ("Arial", 15))
+            value0_label.grid(row=0, column=1)
             
-            plot_elec = data_plot(plot_frame_lad, 90, f_lad, a_lad, canvas_lad)
+            value1_label = ttk.Label(value_labelframe,
+                                        text= "0.000",
+                                        style= "BW.TLabel",
+                                        font= ("Arial", 15))
+            value1_label.grid(row=1, column=1)
+            
+            value2_label = ttk.Label(value_labelframe,
+                                        text= "0.000",
+                                        style= "BW.TLabel",
+                                        font= ("Arial", 15))
+            value2_label.grid(row=2, column=1)
+            
             plot_lad = list()
-
-            plot_frame_res = ttk.Frame(self)
-            plot_frame_res.place(x=475,y=380)
-
-            f_res = None
-            a_res = None
-            canvas_res = None
-            
-            if state == 0:
-                plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-            elif state == 1:
-                plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-            elif state == 2 or state == 3:
-                plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-            else:
-                plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-            
             plot_res = list()
-            
-            plot_frame_res2 = ttk.Frame(self)
-            plot_frame_res2.place(x=930,y=380)
-            
-            f_res2=None
-            a_res2=None
-            canvas_res2=None
-
-            if state2 == 0:
-                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-            elif state2 == 1:
-                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-            elif state2 == 2 or state2 == 3:
-                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-            else:
-                plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-            
             plot_res2 = list()
-            
             plot_time = list()
-
 
             global status_label
             status_label = ttk.Label(self,text="Status: Plot cleared", 
-                                     style="BW.TLabel",font=("Arial", 15))
+                                      style="BW.TLabel",font=("Arial", 15))
             status_label.place(x= 20,y =10)
         
         
         def plotting():
             global cond, cond_all, cond_all_res, cond_lad, cond_res
             global test_var
-            global plot_smu, plot_elec, plot_smu2 
+            
+            # global plot_smu, plot_elec, plot_smu2 
+            
+            global value0_label, value1_label, value2_label
             global plot_lad, plot_res, plot_res2
             global start, timespan, start_timespan, data
             global plot_time
+            global test
             
             """Plot the measured data"""
 
@@ -849,8 +851,14 @@ class PlotPage(tk.Frame):
                     data_to_float_lad = split_data(data_lad)
                     plot_lad.append(data_to_float_lad)
                     plot_time.append(datetime.now().isoformat(timespec='microseconds'))
-                    plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
                     
+                    # plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
+                    
+                    value2_label = ttk.Label(value_labelframe,
+                                             text= str(data_to_float_lad),
+                                             style= "BW.TLabel",
+                                             font= ("Arial", 15))                    
+                    value2_label.grid(row=2, column=1)
                     self.after(1,plotting)
                     
                 if cond_res == True:
@@ -859,7 +867,14 @@ class PlotPage(tk.Frame):
                         data_to_float_res = split_data(data_res)
                         plot_res.append(data_to_float_res)
                         plot_time.append(datetime.now().isoformat(timespec='microseconds'))
-                        plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                        
+                        # plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                        
+                        value0_label = ttk.Label(value_labelframe,
+                                                 text= str(data_to_float_res),
+                                                 style= "BW.TLabel",
+                                                 font= ("Arial", 15))  
+                        value0_label.grid(row=0, column=1)
                         
                         self.after(1,plotting)
                     
@@ -868,8 +883,14 @@ class PlotPage(tk.Frame):
                         data_to_float_res = split_data(data_res)
                         plot_res.append(data_to_float_res)
                         plot_time.append(datetime.now().isoformat(timespec='microseconds'))
-                        plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res)
                         
+                        # plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res)
+                        
+                        value1_label = ttk.Label(value_labelframe,
+                                                 text= str(data_to_float_res),
+                                                 style= "BW.TLabel",
+                                                 font= ("Arial", 15))  
+                        value1_label.grid(row=1, column=1)
                         self.after(1,plotting)
                 
                 if cond_all_res == True:
@@ -882,8 +903,20 @@ class PlotPage(tk.Frame):
                     plot_res2.append(data_to_float_res2)
                     plot_time.append(datetime.now().isoformat(timespec='microseconds'))
                     
-                    plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
-                    plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res2)   
+                    # plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                    # plot(plot_smu2[0], plot_smu2[1], plot_smu2[2], plot_res2)   
+                    
+                    value0_label = ttk.Label(value_labelframe,
+                                             text= str(data_to_float_res),
+                                             style= "BW.TLabel",
+                                             font= ("Arial", 15))  
+                    value0_label.grid(row=0, column=1)
+                    value1_label = ttk.Label(value_labelframe,
+                                             text= str(data_to_float_res2),
+                                             style= "BW.TLabel",
+                                             font= ("Arial", 15)) 
+                    value1_label.grid(row=1, column=1)
+                    
                     self.after(1,plotting)
                     
                 if cond_all == True:
@@ -896,66 +929,23 @@ class PlotPage(tk.Frame):
                     plot_res.append(data_to_float_res)
                     plot_time.append(datetime.now().isoformat(timespec='microseconds'))
 
-                    if len(plot_lad)%20 ==0:
-                        plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
-                        plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
-
-                    self.after(1,plotting)
+                    # if len(plot_lad)%20 ==0:
+                    #     plot(plot_smu[0], plot_smu[1], plot_smu[2], plot_res)
+                    #     plot(plot_elec[0], plot_elec[1], plot_elec[2], plot_lad)
                     
+                    value0_label = ttk.Label(value_labelframe,
+                                             text= str(data_to_float_res),
+                                             style= "BW.TLabel",
+                                             font= ("Arial", 15)) 
+                    value0_label.grid(row=0, column=1)
+                    value2_label = ttk.Label(value_labelframe,
+                                             text= str(data_to_float_lad),
+                                             style= "BW.TLabel",
+                                             font= ("Arial", 15))    
+                    value2_label.grid(row=2, column=1)
+                    self.after(1,plotting)
         
-        """Plot Frame"""
-        plot_frame_lad = ttk.Frame(self)
-        plot_frame_lad.place(x=20, y=380)
-        global plot_label_lad
-        plot_label_lad = ttk.Label(self,text="Plot vom Keithley 6517A", 
-                                 style="BW.TLabel",font=("Arial", 15))
-        plot_label_lad.place(x=20, y=745)
-
-        f_lad=None
-        a_lad=None
-        canvas_lad=None
-
-        plot_elec = data_plot(plot_frame_lad, 90, f_lad, a_lad, canvas_lad)
-
-        plot_frame_res = ttk.Frame(self)
-        plot_frame_res.place(x=475, y=380)
-        global plot_label_res
-        plot_label_res = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. xxx", 
-                                  style="BW.TLabel",font=("Arial", 15))
-        plot_label_res.place(x=475, y=745)
-
-        f_res=None
-        a_res=None
-        canvas_res=None
-
-        if state == 0:
-            plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-        elif state == 1:
-            plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-        elif state == 2 or state == 3:
-            plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
-        else:
-            plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
         
-        plot_frame_res2 = ttk.Frame(self)
-        plot_frame_res2.place(x=930,y=380)
-        global plot_label_res2
-        plot_label_res2 = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. 041", 
-                                 style="BW.TLabel",font=("Arial", 15))
-        plot_label_res2.place(x= 930,y =745)
-
-        f_res2=None
-        a_res2=None
-        canvas_res2=None
-
-        if state2 == 0:
-            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-        elif state2 == 1:
-            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-        elif state2 == 2 or state2 == 3:
-            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
-        else:
-            plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
     
         def split_data(data):
             x = data.split(',')
@@ -974,3 +964,115 @@ class PlotPage(tk.Frame):
 
 app = Main_page()
 app.mainloop()
+
+        #     """Clear the electrometer plot"""
+        #     global plot_elec, plot_lad
+        #     global plot_smu, plot_res
+        #     global plot_smu2, plot_res2
+        #     global title, ylabel, state
+        #     global title2, ylabel2, state2
+        #     global plot_time
+            
+        #     plot_frame_lad = ttk.Frame(self)
+        #     plot_frame_lad.place(x=20,y=380)
+
+        #     f_lad = None
+        #     a_lad = None
+        #     canvas_lad = None
+
+            
+        #     plot_elec = data_plot(plot_frame_lad, 90, f_lad, a_lad, canvas_lad)
+        #     plot_lad = list()
+
+        #     plot_frame_res = ttk.Frame(self)
+        #     plot_frame_res.place(x=475,y=380)
+
+        #     f_res = None
+        #     a_res = None
+        #     canvas_res = None
+            
+        #     if state == 0:
+        #         plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+        #     elif state == 1:
+        #         plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+        #     elif state == 2 or state == 3:
+        #         plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+        #     else:
+        #         plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+            
+        #     plot_res = list()
+            
+        #     plot_frame_res2 = ttk.Frame(self)
+        #     plot_frame_res2.place(x=930,y=380)
+            
+        #     f_res2=None
+        #     a_res2=None
+        #     canvas_res2=None
+
+        #     if state2 == 0:
+        #         plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        #     elif state2 == 1:
+        #         plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        #     elif state2 == 2 or state2 == 3:
+        #         plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+        #     else:
+        #         plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+            
+        #     plot_res2 = list()
+            
+        #     plot_time = list()
+
+
+# """Plot Frame"""
+# plot_frame_lad = ttk.Frame(self)
+# plot_frame_lad.place(x=20, y=380)
+# global plot_label_lad
+# plot_label_lad = ttk.Label(self,text="Plot vom Keithley 6517A", 
+#                          style="BW.TLabel",font=("Arial", 15))
+# plot_label_lad.place(x=20, y=745)
+
+# f_lad=None
+# a_lad=None
+# canvas_lad=None
+
+# plot_elec = data_plot(plot_frame_lad, 90, f_lad, a_lad, canvas_lad)
+
+# plot_frame_res = ttk.Frame(self)
+# plot_frame_res.place(x=475, y=380)
+# global plot_label_res
+# plot_label_res = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. xxx", 
+#                           style="BW.TLabel",font=("Arial", 15))
+# plot_label_res.place(x=475, y=745)
+
+# f_res=None
+# a_res=None
+# canvas_res=None
+
+# if state == 0:
+#     plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+# elif state == 1:
+#     plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+# elif state == 2 or state == 3:
+#     plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+# else:
+#     plot_smu = data_plot_resistance(title, ylabel, plot_frame_res, 90, f_res, a_res, canvas_res)
+
+# plot_frame_res2 = ttk.Frame(self)
+# plot_frame_res2.place(x=930,y=380)
+# global plot_label_res2
+# plot_label_res2 = ttk.Label(self,text="Plot vom Keithley SMU 2450, Nr. 041", 
+#                          style="BW.TLabel",font=("Arial", 15))
+# plot_label_res2.place(x= 930,y =745)
+
+# f_res2=None
+# a_res2=None
+# canvas_res2=None
+
+# if state2 == 0:
+#     plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+# elif state2 == 1:
+#     plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+# elif state2 == 2 or state2 == 3:
+#     plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)
+# else:
+#     plot_smu2 = data_plot_resistance(title2, ylabel2, plot_frame_res2, 90, f_res2, a_res2, canvas_res2)

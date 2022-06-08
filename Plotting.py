@@ -42,7 +42,7 @@ data_smu_t = np.array(np.ones(len(data_smu['Time'])))
 for i in range(len(data_smu['Time'])):
     data_smu_t[i] = data_smu['Time'][i].total_seconds()
     
-t=0.764
+t=0.0
     
 data_smu_t = data_smu_t + t
 data_smu_R = np.array(data_smu['Resistance'], dtype= np.double)
