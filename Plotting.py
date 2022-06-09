@@ -90,6 +90,11 @@ ax4.set_xlabel('Weg [mm]')
 ax4.set_ylabel('Kraft [N]')
 ax4.plot(data_force_s, data_force_F)
 
+# fig3, ax5 = plt.subplots()
+# ax5.set_xlabel('Kraft [N]')
+# ax5.set_ylabel('Widerstandsänderung [%]')
+# ax5.plot(data_force_F, data_smu_r)
+
 mpl.cursor(hover=True)
 
 plt.show()
