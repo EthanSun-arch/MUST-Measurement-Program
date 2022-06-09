@@ -30,7 +30,6 @@ def isfloat(value):
   except ValueError:
     return False
 
-
 global cond, cond_all, cond_all_res, cond_res, cond_lad
 
 class Main_page(tk.Tk):
@@ -384,7 +383,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Electrometer: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 450, y = 600)
+            info_label.place(x = 20, y = 600)
         
         def connect_to_smu():
             global rm_smu, inst_smu
@@ -399,7 +398,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 450, y = 600)
+            info_label.place(x = 20, y = 620)
             
         def connect_to_smu2():
             global rm_smu2, inst_smu2
@@ -413,7 +412,7 @@ class PlotPage(tk.Frame):
 
             info_label = ttk.Label(self,text=f"Soucemeter: {inf}", 
                                    style="BW.TLabel",font=("Arial", 10))
-            info_label.place(x = 650, y = 600)
+            info_label.place(x = 20, y = 640)
 
         def connect_to_lad():
             global cond_lad
