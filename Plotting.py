@@ -11,36 +11,38 @@ import pandas as pd
 from scipy import stats as st
 from scipy import signal as sg
 import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import filedialog
 import mplcursors as mpl
 import ruptures as rpt
 
+#%%
+root = tk.Tk()
+root.withdraw()
 
+#%%
+filename_force = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', title='File Open Kraftmessung; Bitte die .txt Datei auswählen')
+filename_res = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', title='File Open Widerstandsmessung; Bitte die .csv Datei auswählen')
+filename_ref = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', title='File Open Referenzmessung; Bitte die .txt Datei auswählen')  
 
-
+repeats = int(filename_force.split('_')[-1].split('x')[0])
 
 #%%
 """Importing Data via Pandas"""
-foldername = '220614_1.Linearisierung/'
-directory = foldername + '220614_Druck_5Nmax_'
-repeats = 10
-zusatz = '3'
 
 bkps = 4* repeats 
 
-data_force = pd.read_csv('C:/Users/Esan/Documents/Masterarbeit/Messungen/'+ directory + str(repeats) + 'x' 
-                         + zusatz + '.txt',
+data_force = pd.read_csv(filename_force,
                          sep= ';',
                          dtype= float)
 
-data_force2 = pd.read_csv("C:/Users/Esan/Documents/Masterarbeit/Messungen/220609_Version_2/" 
-                          + "220609_Druck_1_3,8Nmax_ohneSensor.txt",
-                          sep=";",
-                          dtype=float)
-
-data_smu = pd.read_csv('C:/Users/Esan/Documents/Masterarbeit/Messungen/'+ directory + str(repeats) + 'x' 
-                       + zusatz + '.csv',
+data_smu = pd.read_csv(filename_res,
                        dtype= {'Widerstand [Ohm]': np.single},
                        sep= ',')
+
+data_force2 = pd.read_csv(filename_ref,
+                          sep=";",
+                          dtype=float)
 
 #%%
 """Adjusting the time into realtive values"""
@@ -76,7 +78,10 @@ fig.set_tight_layout(True)
 """Plotting Time/Resistance/Force"""
 ax[0][0].set_xlabel('Zeit [s]')
 ax[0][0].set_ylabel('Änderung [%] normiert auf das Maximum', color = 'tab:red')
-ax[0][0].plot(data_smu_t, data_smu_R_d/max(data_smu_R_d), color= 'tab:red')
+ax[0][0].plot(data_smu_t, 
+              data_smu_R,
+              #data_smu_R_d/max(data_smu_R_d)*100, 
+              color= 'tab:red')
 ax[0][0].tick_params(axis='y', labelcolor= 'tab:red')
 ax[0][0].legend(labels=['Widerstandsmessung'], loc='upper left')
 
@@ -90,7 +95,10 @@ ax2.legend(labels=['Kraftmessung'], loc= 'upper right')
 """Plotting Time/Resistance/Displacement"""
 ax[1][0].set_xlabel('Zeit [s]')
 ax[1][0].set_ylabel('Änderung [%] normiert auf das Maximum', color = 'tab:red')
-ax[1][0].plot(data_smu_t, data_smu_R_d/max(data_smu_R_d), color= 'tab:red')
+ax[1][0].plot(data_smu_t, 
+              data_smu_R,
+              #data_smu_R_d/max(data_smu_R_d)*100, 
+              color= 'tab:red')
 ax[1][0].tick_params(axis='y', labelcolor= 'tab:red')
 ax[1][0].legend(labels=['Widerstandsmessung'], loc='upper left')
 
@@ -124,7 +132,7 @@ ax2.legend(labels=['Kraftmessung'], loc= 'upper right')
 algo = rpt.BottomUp(model='l2').fit(filtered_F)
 result = algo.predict(bkps)
 
-# rpt.display(data_force_F, result)
+rpt.display(data_force_F, result)
 #%%
 """Computing the linear error"""
 f_time, f_value = [], []
@@ -193,16 +201,16 @@ for i in range(len(x_f)):
     else:
         ax4[0][1].plot(x_f[i], res_value3[i], label='Abfall ' + str(i))
         ax4[0][1].plot(x_f[i], lin_f[i].intercept + lin_f[i].slope * x_f[i], '--r', label= 'fitted Abfall ' + str(i))
-        ax4[0][1].invert_xaxis()
         ax4[0][1].set_xlabel('Kraft [N]')
         ax4[0][1].set_ylabel('Widerstand [kOhm]')
         # ax4[0][1].legend()
         
         ax4[1][1].scatter(x_f[i], lin_err[i], s= 0.3)
-        ax4[1][1].invert_xaxis()
         ax4[1][1].set_xlabel('Kraft [N]')
         ax4[1][1].set_ylabel('Linearisierungsfehler [%] normiert auf den Messbereich')
 
+ax4[0][1].invert_xaxis()
+ax4[1][1].invert_xaxis()
 
 """Plotting Displacement/Force"""
 fig3, ax6 = plt.subplots()
