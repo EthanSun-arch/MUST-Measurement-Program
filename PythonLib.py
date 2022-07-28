@@ -19,8 +19,9 @@ import mplcursors as mpl
 
 import ruptures as rpt
 
+#%%
 def data_transfer_force():
-    filename_force = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', 
+    filename_force = filedialog.askopenfilename(initialdir='Z:/ThesesMaster/Sundaralingam Esan/050__Messdaten/Messungen/', 
                                                 title='File Open Kraftmessung; Bitte die .txt Datei auswählen')
     data_force = pd.read_csv(filename_force,
                              sep=';',
@@ -32,7 +33,7 @@ def data_transfer_force():
     return data_force
 
 def data_transfer_smu():
-    filename_res = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', 
+    filename_res = filedialog.askopenfilename(initialdir='Z:/ThesesMaster/Sundaralingam Esan/050__Messdaten/Messungen/',  
                                               title='File Open Widerstandsmessung; Bitte die .csv Datei auswählen')
     data_smu = pd.read_csv(filename_res,
                            sep=',',
@@ -42,7 +43,7 @@ def data_transfer_smu():
     return data_smu
 
 def data_transfer_ref():
-    filename_ref = filedialog.askopenfilename(initialdir='C:/Users/Esan/Documents/Masterarbeit/Messungen/', 
+    filename_ref = filedialog.askopenfilename(initialdir='Z:/ThesesMaster/Sundaralingam Esan/050__Messdaten/Messungen/', 
                                               title='File Open Referenzmessung; Bitte die .txt Datei auswählen')  
     data_ref = pd.read_csv(filename_ref,
                            sep=';',
@@ -50,7 +51,7 @@ def data_transfer_ref():
     
     return data_ref
     
-
+#%%
 def export_smu_t(data_smu):
     data_smu['Zeit [Datum+T+Zeit]'] = pd.to_datetime(data_smu['Zeit [Datum+T+Zeit]'])
     firstValue = data_smu['Zeit [Datum+T+Zeit]'].iloc[0]
@@ -82,96 +83,61 @@ def export_force_s(data_force):
     
     return s
 
-def plot_force(t_F, F, s, t_F_ref, F_ref, s_ref):
-    fig, ax = plt.subplot_mosaic([[0,2],[1,2]])
-    fig.set_tight_layout(True)
+#%%
+def compute_time_diff_one(t_r, r, tensile):
     
-    ax[0].set_xlabel('Zeit [s]')
-    ax[0].set_ylabel('Kraft [N]', color= 'tab:red')
-    ax[0].plot(t_F, F, label= 'Kraftmessung')
-    ax[0].plot(t_F_ref, F_ref, color='black', label= 'Referenz')
-    ax[0].legend()
+    if tensile == True:
+        r_time = t_r[t_r <= 50]
+        r_time = r_time[100:len(r_time)]
+        r_value = r[t_r <=50]
+        r_value = r_value[100:len(r_value)]
+    elif tensile == False:
+        r_time = t_r[t_r <= 31]
+        r_time = r_time[100:len(r_time)]
+        r_value = r[t_r <= 31]
+        r_value = r_value[100:len(r_value)]
+        
+    b, a = sg.butter(3, 0.05, 'lowpass')
+    filtered_dr = sg.filtfilt(b, a, np.gradient(r_value, r_time))
     
-    ax[1].set_xlabel('Zeit [s]')
-    ax[1].set_ylabel('Weg [mm]')
-    ax[1].plot(t_F, s, label= 'Wegmessung')
-    ax[1].plot(t_F_ref, s_ref, color='black', label= 'Referenz')
-    ax[1].legend()
+    result = rpt.Pelt(model='l2').fit_predict(filtered_dr, 0.0015)
     
-    ax[2].set_xlabel('Weg [mm]')
-    ax[2].set_ylabel('Kraft [N]')
-    ax[2].plot(s, F, label= 'Messung')
-    ax[2].plot(s_ref, F_ref, color='black', label= 'Referenz')
-    ax[2].legend()
+    rpt.display(filtered_dr, result)
     
-    plt.show()
-    
-def plot_res_and_force(t_r, r_d, t_F, F, s, t_F_ref, F_ref, s_ref):
-    fig, ax = plt.subplot_mosaic([[0,2],[1,2]])
-    fig.set_tight_layout(True)
-    ax[0].set_xlabel('Zeit [s]')
-    ax[0].set_ylabel('Kraft [N]', color = 'tab:red')
-    ax[0].tick_params(axis= 'y', labelcolor= 'tab:red')
-    ax[0].plot(t_F, F, color= 'tab:red', label= 'Kraftmessung')
-    # ax[0].plot(t_F_ref, F_ref, color= 'black', label= 'Referenz')
-    ax[0].legend(loc= 'upper left')
+    return result
 
-    ax2 = ax[0].twinx()
-    ax2.set_ylabel(#'Absolute Differenz zum Anfangswert [Ohm]',
-                   'Änderung [%] normiert auf das Maximum', 
-                   color= 'tab:blue')
-    ax2.tick_params(axis= 'y', labelcolor= 'tab:blue')
-    ax2.plot(t_r, r_d, color= 'tab:blue', label= 'Widerstandsmessung')
-    ax2.legend(loc= 'upper right')
+def compute_time_diff(t_F, F, t_r, r, tensile):
+    result = compute_time_diff_one(t_r, r, tensile)
+    result2 = compute_time_diff_one(t_F, F, tensile)
     
-    ax[1].set_xlabel('Zeit [s]')
-    ax[1].set_ylabel('Weg [mm]', color = 'tab:red')
-    ax[1].tick_params(axis= 'y', labelcolor= 'tab:red')
-    ax[1].plot(t_F, s, color= 'tab:red', label= 'Wegmessung')
-    #ax[1].plot(t_F_ref, s_ref, color= 'black', label= 'Referenz')
-    ax[1].legend(loc= 'upper left')
-
-    ax3 = ax[1].twinx()
-    ax3.set_ylabel(#'Absolute Differenz zum Anfangswert [Ohm]',
-                   'Änderung [%] normiert auf das Maximum', 
-                   color= 'tab:blue')
-    ax3.tick_params(axis= 'y', labelcolor= 'tab:blue')
-    ax3.plot(t_r, r_d, color= 'tab:blue', label= 'Widerstandsmessung')
-    ax3.legend(loc= 'upper right')
+    r_time = t_r[t_r <= 50]
+    r_time = r_time[100:len(r_time)]
+    r_value = r[t_r <=50]
+    r_value = r_value[100:len(r_value)]
     
-    ax[2].set_xlabel('Weg [mm]')
-    ax[2].set_ylabel('Kraft [N]')
-    ax[2].plot(s, F, label= 'Messung', color= 'tab:red')
-    ax[2].plot(s_ref, F_ref, label= 'Referenz', color= 'black')
-    ax[2].legend()
-    # mpl.cursor(hover=True)
+    f_time = t_F[t_F <= 50]
+    f_time = f_time[100:len(f_time)]
+    f_value = F[t_F <= 50]
+    f_value = f_value[100:len(f_value)]
     
-    # plt.savefig("res_force_plot.svg", dpi=300.0, orientation='landscape', papertype='a4')
+    diff = f_time[result2[0]] - r_time[result[0]]
     
-    plt.show()
+    return diff, f_time[result2[0]]
 
 def compute_gradient(t_F, F, t_r, r):
+    
+    r_max = []
+    for i in range(len(r)):
+        if r[i] == max(r):
+            r_max.append(i)
+    
     b, a = sg.butter(3, 0.05, 'lowpass')
-    filtered_dr = sg.filtfilt(b, a, np.gradient(r, t_r))
+    filtered_dr = sg.filtfilt(b, a, np.gradient(r[:r_max[0]-1], t_r[:r_max[0]-1]))
     
     b, a = sg.butter(3, 0.01, 'lowpass')
     filtered_dF = sg.filtfilt(b, a, np.gradient(F, t_F))
     
     return [[filtered_dF], [filtered_dr]]
-
-def plot_gradient(t_F, dF, t_r, dr):
-    fig, ax = plt.subplots()
-    ax.set_xlabel('Zeit [s]')
-    ax.set_ylabel('Steigung der Kraft [N/s]', color = 'tab:red')
-    ax.plot(t_F, dF, color= 'tab:red', label= 'Kraftmessung')
-    ax.tick_params(axis='y', labelcolor= 'tab:red')
-    ax.legend(loc='upper left')
-
-    ax2 = ax.twinx()
-    ax2.set_ylabel('Steigung der Widerstands [Ohm/s]', color= 'tab:blue')
-    ax2.plot(t_r, dr, color= 'tab:blue', label= 'widerstandsmessung')
-    ax2.tick_params(axis='y', labelcolor= 'tab:blue')
-    ax2.legend(loc= 'upper right')
     
 def compute_force_lin_err(t_F, F, s, bkps):
     b,a = sg.butter(3, 0.01, 'lowpass')
@@ -195,43 +161,6 @@ def compute_force_lin_err(t_F, F, s, bkps):
         lin_err.append(temp)
     
     return [[x_s], [y_force], [lin_fit], [lin_err]]
-
-def plot_force_lin_err(x_s, y_force, lin_fit, lin_err):
-    fig, ax = plt.subplot_mosaic([[0,1],[2,3]])
-    fig.set_tight_layout(True)
-    ax[0].set_xlabel('Weg [mm]')
-    ax[0].set_ylabel('Kraft [N]')
-
-    ax[1].set_xlabel('Weg [mm]')
-    ax[1].set_ylabel('Kraft [N]')
-    # ax[1].invert_xaxis()
-
-    ax[2].set_xlabel('Weg [mm]')
-    ax[2].set_ylabel('Linearisierungsfehler [%]')
-
-    ax[3].set_xlabel('Weg [mm]')
-    ax[3].set_ylabel('Linearisierungsfehler [%]')
-    # ax[3].invert_xaxis()
-    
-    j, k = 1, 1
-    for i in range(len(x_s)):
-        if i%2 == 0:
-            ax[0].plot(x_s[i], y_force[i], label= 'Steiung '+ str(j) + ' der Kraft [N]')
-            ax[0].plot(x_s[i], lin_fit[i], '--', label= 'fitted Steigung ' + str(j) + ' der Kraft [N]')
-            ax[2].plot(x_s[i], lin_err[i], label= 'Fehler der Steigung ' + str(j) + ' [%]')
-            j += 1
-        else:
-            ax[1].plot(x_s[i], y_force[i], label= 'Abfall' + str(k) + ' der Kraft [N]')
-            ax[1].plot(x_s[i], lin_fit[i], '--', label= 'fitted Abfall ' + str(k) + ' der Kraft [N]')
-            ax[3].plot(x_s[i], lin_err[i], label= 'Fehler des Abfalls ' + str(k) + ' [%]')
-            k += 1
-            
-    ax[0].legend()
-    ax[1].legend()
-    ax[2].legend()
-    ax[3].legend()
-    # mpl.cursor(hover=True)
-    plt.show()
     
 def compute_res_lin_err(data_smu, t_r, R, t_F, F, bkps):
     b,a = sg.butter(3, 0.01, 'lowpass')
@@ -272,6 +201,144 @@ def compute_res_lin_err(data_smu, t_r, R, t_F, F, bkps):
     
     return [[x_f], [r_value], [lin_fit], [lin_err]]
 
+def compute_strain_res(l_0, A_0, t_r, R, s, F, data, tensile):
+    stress = F / A_0
+    strain = s/l_0 * 100
+    sg.resample(R, len(s))
+    result = compute_time_diff_one(data, t_r, R, tensile)
+    
+
+#%%
+
+def plot_force(t_F, F, s, t_F_ref, F_ref, s_ref):
+    fig, ax = plt.subplot_mosaic([[0,2],[1,2]])
+    fig.set_tight_layout(True)
+    
+    ax[0].set_xlabel('Zeit [s]')
+    ax[0].set_ylabel('Kraft [N]', color= 'tab:red')
+    ax[0].plot(t_F, F, label= 'Kraftmessung')
+    ax[0].plot(t_F_ref, F_ref, color='black', label= 'Referenz')
+    ax[0].legend()
+    
+    ax[1].set_xlabel('Zeit [s]')
+    ax[1].set_ylabel('Weg [mm]')
+    ax[1].plot(t_F, s, label= 'Wegmessung')
+    ax[1].plot(t_F_ref, s_ref, color='black', label= 'Referenz')
+    ax[1].legend()
+    
+    ax[2].set_xlabel('Weg [mm]')
+    ax[2].set_ylabel('Kraft [N]')
+    ax[2].plot(s, F, label= 'Messung')
+    ax[2].plot(s_ref, F_ref, color='black', label= 'Referenz')
+    ax[2].legend()
+    
+    plt.show()
+    
+def plot_res_and_force(t_r, r_d, t_F, F, s, t_F_ref, F_ref, s_ref, y_achse, res_label, ref_label, sensor): 
+    
+    r_max = []
+    for i in range(len(r_d)):
+        if r_d[i] == max(r_d):
+            r_max.append(i)
+    
+    fig, ax = plt.subplot_mosaic([[0],[1]])
+    fig.set_tight_layout(True)
+    ax[0].set_xlabel('Zeit [s]')
+    ax[0].set_ylabel('Kraft [N]', color = 'tab:red')
+    ax[0].tick_params(axis= 'y', labelcolor= 'tab:red')
+    ax[0].plot(t_F, F, color= 'tab:red', label= 'Kraft Prüfmaschine')
+    ax[0].legend(bbox_to_anchor =(0,1.1), loc= 'upper left')
+    
+    ax2 = ax[0].twinx()
+    ax2.set_ylabel(y_achse,
+                   color= 'tab:blue')
+    ax2.tick_params(axis= 'y', labelcolor= 'tab:blue')
+    ax2.set_ylim(None, r_d[r_max[0]-1], auto= sensor)
+    ax2.plot(t_r, r_d, color= 'tab:blue', label= res_label)
+    ax2.legend(bbox_to_anchor =(1,1.1), loc= 'upper right')
+    
+    ax[1].set_xlabel('Zeit [s]')
+    ax[1].set_ylabel('Weg [mm]', color = 'tab:red')
+    ax[1].tick_params(axis= 'y', labelcolor= 'tab:red')
+    ax[1].plot(t_F, s, color= 'tab:red', label= 'Weg Prüfmaschine')
+    ax[1].legend(bbox_to_anchor =(0,1.1), loc= 'upper left')
+
+    ax3 = ax[1].twinx()
+    ax3.set_ylabel(y_achse,
+                   color= 'tab:blue')
+    ax3.tick_params(axis= 'y', labelcolor= 'tab:blue')
+    ax3.set_ylim(None, r_d[r_max[0]-1], auto= sensor)
+    ax3.plot(t_r, r_d, color= 'tab:blue', label= res_label)
+    ax3.legend(bbox_to_anchor =(1,1.1), loc= 'upper right')
+    
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Weg [mm]')
+    ax.set_ylabel('Kraft [N]')
+    ax.plot(s, F, label= 'Messung', color= 'tab:red')
+    ax.plot(s_ref, F_ref, label= 'Referenz: '+ ref_label, color= 'black')
+    ax.legend()
+    mpl.cursor(hover=True)
+    
+    # plt.savefig("res_force_plot.svg", dpi=300.0, orientation='landscape', papertype='a4')
+    
+    plt.show()
+    
+    
+def plot_gradient(t_F, dF, t_r, dr):
+    
+    r_max = []
+    for i in range(len(dr)):
+        if dr[i] == max(dr):
+            r_max.append(i)
+    
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Zeit [s]')
+    ax.set_ylabel('Steigung der Kraft [N/s]', color = 'tab:red')
+    ax.plot(t_F, dF, color= 'tab:red', label= 'Kraftmessung')
+    ax.tick_params(axis='y', labelcolor= 'tab:red')
+    ax.legend(loc='upper left')
+
+    ax2 = ax.twinx()
+    ax2.set_ylabel('Steigung der Widerstands [Ohm/s]', color= 'tab:blue')
+    ax2.plot(t_r[:r_max[0]], dr[:r_max[0]], color= 'tab:blue', label= 'widerstandsmessung')
+    ax2.tick_params(axis='y', labelcolor= 'tab:blue')
+    ax2.legend(loc= 'upper right')
+
+def plot_force_lin_err(x_s, y_force, lin_fit, lin_err):
+    fig, ax = plt.subplot_mosaic([[0,1],[2,3]])
+    fig.set_tight_layout(True)
+    ax[0].set_xlabel('Weg [mm]')
+    ax[0].set_ylabel('Kraft [N]')
+
+    ax[1].set_xlabel('Weg [mm]')
+    ax[1].set_ylabel('Kraft [N]')
+
+    ax[2].set_xlabel('Weg [mm]')
+    ax[2].set_ylabel('Linearisierungsfehler [%]')
+
+    ax[3].set_xlabel('Weg [mm]')
+    ax[3].set_ylabel('Linearisierungsfehler [%]')
+    
+    j, k = 1, 1
+    for i in range(len(x_s)):
+        if i%2 == 0:
+            ax[0].plot(x_s[i], y_force[i], label= 'Steiung '+ str(j) + ' der Kraft [N]')
+            ax[0].plot(x_s[i], lin_fit[i], '--', label= 'fitted Steigung ' + str(j) + ' der Kraft [N]')
+            ax[2].plot(x_s[i], lin_err[i], label= 'Fehler der Steigung ' + str(j) + ' [%]')
+            j += 1
+        else:
+            ax[1].plot(x_s[i], y_force[i], label= 'Abfall' + str(k) + ' der Kraft [N]')
+            ax[1].plot(x_s[i], lin_fit[i], '--', label= 'fitted Abfall ' + str(k) + ' der Kraft [N]')
+            ax[3].plot(x_s[i], lin_err[i], label= 'Fehler des Abfalls ' + str(k) + ' [%]')
+            k += 1
+            
+    ax[0].legend()
+    ax[1].legend()
+    ax[2].legend()
+    ax[3].legend()
+    # mpl.cursor(hover=True)
+    plt.show()
+
 def plot_res_lin_err(x_f, r_value, lin_fit, lin_err):
     fig, ax = plt.subplot_mosaic([[0,1],[2,3]])
     fig.set_tight_layout(True)
@@ -308,3 +375,8 @@ def plot_res_lin_err(x_f, r_value, lin_fit, lin_err):
     ax[3].legend()
     mpl.cursor(hover=True)
     plt.show()
+
+    
+    
+    
+        

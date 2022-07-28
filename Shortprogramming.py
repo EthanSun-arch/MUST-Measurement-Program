@@ -17,6 +17,7 @@ R       = pl.export_smu_R(res)
 R_d     = (R - R[0])
 r       = R/max(R) * 100
 r_d     = R_d/max(R_d) * 100 
+deltaR = (R - R[0])/R[0] * 100
 
 t_f     = pl.export_force_t(force)
 f       = pl.export_force_F(force)
@@ -26,24 +27,24 @@ t_ref   = pl.export_force_t(ref)
 f_ref   = pl.export_force_F(ref)
 x_ref   = pl.export_force_s(ref)
 
-# pl.plot_force(t_f, f, x, t_ref, f_ref, x_ref)
-
-pl.plot_res_and_force(t_r+0.561, R_d, t_f, f, x, t_ref, f_ref, x_ref)
-
-grad = pl.compute_gradient(t_f, f, t_r, R)
-
-pl.plot_gradient(t_f, grad[0][0], t_r, grad[1][0])
-
-bkps = 20
-
-# lin_err_f = pl.compute_force_lin_err(t_f, f, x, bkps)
-
-# pl.plot_force_lin_err(lin_err_f[0][0], lin_err_f[1][0], 
-#                       lin_err_f[2][0], lin_err_f[3][0])
-
-lin_err_r = pl.compute_res_lin_err(res, t_r, R_d, t_f, f, bkps)
-
-pl.plot_res_lin_err(lin_err_r[0][0], lin_err_r[1][0], 
-                     lin_err_r[2][0], lin_err_r[3][0])
 
 
+y_achse = ['Absolute Differenz zum Anfangswert [Ohm]', 'Änderung [%] normiert auf das Maximum', 'deltaR/R_0 [%]' ]
+res_label = ['Widerstandsmessung des eingeklemmten Sensors', 'Widerstandsmessung der gedruckten Feder', 'Widerstand der Zugprobe']
+ref_label = ['Einhausung mit Doppelblechblattfeder', 'Einhausung mit Doppel-PLA-Blattfeder']
+
+diff, f_diff = pl.compute_time_diff(t_f, f, t_r, r, tensile= False)
+
+if diff < 0:
+    t_r = t_r - abs(diff)    
+elif diff > 0:
+    t_r = t_r + abs(diff)
+
+pl.plot_res_and_force(t_r, deltaR, 
+                      t_f, f, x, 
+                      t_ref, f_ref, x_ref, 
+                      y_achse[2], res_label[2], ref_label[1], sensor= False)
+
+# grad = pl.compute_gradient(t_f, f, t_r, r)
+
+# pl.plot_gradient(t_f, grad[0][0], t_r, grad[1][0])
